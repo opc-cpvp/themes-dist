@@ -1,10 +1,10 @@
 /*
- * Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
- * wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
- */
+* Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
+* wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
+*/
 /*
 ----- Inuktitut dictionary (il8n) ---
- */
+*/
 ( function( wb ) {
 "use strict";
 
@@ -107,6 +107,7 @@ wb.i18nDict = {
 	"frm-nosubmit": "ᑖᓐᓇ ᑎᑎᖅᑲᖅ ᐅᑎᖅᑎᒐᒃᓴᐅᙱᑦᑐᖅ ᐅᓇ ᐱᔾᔪᑕᐅᓪᓗᓂ",
 	"errs-fnd": "ᑕᒻᒪᖅᓯᒪᔪᓂᑦ ᖃᐅᔨᔪᖅ",
 	"err-fnd": "ᑕᒻᒪᖅᓯᒪᔪᒥᑦ ᖃᐅᔨᔪᖅ",
+	"err-correct": "(Correct and resubmit)",
 
 	/* Date picker */
 	"date-hide": "ᐅᓪᓗᖅᓯᐅᑎ ᓴᖅᑭᔮᕈᓐᓂᖅᑎᓪᓕ",
@@ -156,6 +157,7 @@ wb.i18nDict = {
 	/* Charts widget */
 	"tbl-txt": "ᑭᐳ",
 	"tbl-dtls": "ᓴᓇᒐᖅ. ᑭᐳᒥ ᓇᓗᓇᐃᖅᑕᐅᓯᒪᔪᑦ.",
+	"chrt-cmbslc": "Combined slice",
 
 	/* Session timeout */
 	"st-to-msg-bgn": "ᐱᓕᕆᐊᑦ ᐃᒻᒥᓂ ᓄᖅᖃᕐᓂᐊᖅᑐᖅ ᐃᒪᓐᓇᑎᒋ #ᒥᓂᑦᓯᓂ# ᒥᓂᑦᓯᓂ #ᑎᑦᑕᓂ# ᑎᑦᑕᓂ.",
@@ -196,9 +198,9 @@ wb.i18nDict = {
 	"geo-allyttl": "ᑐᑭᓕᐊᕈᑎᑦ: ᓄᓇᙳᐊᓕᕆᓂᖅ",
 	"geo-tgllyr": "ᓴᖅᑭᔮᕐᓂᖓ ᓇᓕᐊᓐᓅᕋᐅᑎᓗᒍ",
 	"geo-hdnlyr": "ᑕᒪᓐᓇ ᒫᓐᓇᐅᔪᖅ ᐃᔨᖅᓯᒪᔪᖅ.",
-	"geo-bmapurl": "@geo-bmapurl@",
+	"geo-bmapurl": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
 	"geo-bmapttl": "BaseMaps_CBMT3978",
-	"geo-bmapurltxt": "@geo-bmapurltxt@",
+	"geo-bmapurltxt": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
 	"geo-attrlnk": "//geogratis.gc.ca/geogratis/CBM_CBC?lang=en",
 	"geo-attrttl": "GeoGratis −ᑲᓇᑕᙳᐊᒥᓄᓇᙳᐊᖅ",
 	"geo-sel": "ᓂᕈᓗᓪᓕ",

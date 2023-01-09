@@ -1,10 +1,10 @@
 /*
- * Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
- * wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
- */
+* Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
+* wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
+*/
 /*
 ----- Chinese dictionary (il8n) ---
- */
+*/
 ( function( wb ) {
 "use strict";
 
@@ -107,6 +107,7 @@ wb.i18nDict = {
 	"frm-nosubmit": "本表格不能傳送因為",
 	"errs-fnd": "內有錯誤。",
 	"err-fnd": "出現錯誤。",
+	"err-correct": "(Correct and resubmit)",
 
 	/* Date picker */
 	"date-hide": "隱藏行事曆",
@@ -156,6 +157,7 @@ wb.i18nDict = {
 	/* Charts widget */
 	"tbl-txt": "表格",
 	"tbl-dtls": "圖表，詳細內容在表格中。",
+	"chrt-cmbslc": "Combined slice",
 
 	/* Session timeout */
 	"st-to-msg-bgn": "#min#＃分#sec#秒，您的會話將自動失效。",
@@ -196,9 +198,9 @@ wb.i18nDict = {
 	"geo-allyttl": "說明：地圖導航",
 	"geo-tgllyr": "該層的顯示切換",
 	"geo-hdnlyr": "這層隱藏。",
-	"geo-bmapurl": "@geo-bmapurl@",
+	"geo-bmapurl": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
 	"geo-bmapttl": "BaseMaps_CBMT3978",
-	"geo-bmapurltxt": "@geo-bmapurltxt@",
+	"geo-bmapurltxt": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
 	"geo-attrlnk": "//geogratis.gc.ca/geogratis/CBM_CBC?lang=en",
 	"geo-attrttl": "GeoGratis-加拿大底圖（英語或法語",
 	"geo-sel": "選擇",
@@ -238,6 +240,16 @@ wb.i18nDict = {
 } )( wb );
 
 wb.doc.one( "formLanguages.wb", function() {
+(function( factory ) {
+	if ( typeof define === "function" && define.amd ) {
+		define( ["jquery", "../jquery.validate"], factory );
+	} else if (typeof module === "object" && module.exports) {
+		module.exports = factory( require( "jquery" ) );
+	} else {
+		factory( jQuery );
+	}
+}(function( $ ) {
+
 /*
  * Translated default messages for the jQuery validation plugin.
  * Locale: ZH (Chinese, 中文 (Zhōngwén), 汉语, 漢語)
@@ -261,6 +273,7 @@ $.extend( $.validator.messages, {
 	max: $.validator.format( "请输入不大于 {0} 的数值" ),
 	min: $.validator.format( "请输入不小于 {0} 的数值" )
 } );
-
+return $;
+}));
 
 });

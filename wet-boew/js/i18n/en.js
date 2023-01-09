@@ -1,10 +1,10 @@
 /*
- * Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
- * wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
- */
+* Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
+* wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
+*/
 /*
 ----- English dictionary (il8n) ---
- */
+*/
 ( function( wb ) {
 "use strict";
 
@@ -107,6 +107,7 @@ wb.i18nDict = {
 	"frm-nosubmit": "The form could not be submitted because ",
 	"errs-fnd": " errors were found.",
 	"err-fnd": " error was found.",
+	"err-correct": "(Correct and resubmit)",
 
 	/* Date picker */
 	"date-hide": "Hide calendar",
@@ -156,6 +157,7 @@ wb.i18nDict = {
 	/* Charts widget */
 	"tbl-txt": "Table",
 	"tbl-dtls": "Chart. Details in the following table.",
+	"chrt-cmbslc": "Combined slice",
 
 	/* Session timeout */
 	"st-to-msg-bgn": "Your session will expire automatically in #min# min #sec# sec.",
@@ -196,9 +198,9 @@ wb.i18nDict = {
 	"geo-allyttl": "Instructions: Map Navigation",
 	"geo-tgllyr": "Toggle the display of the layer",
 	"geo-hdnlyr": "This layer is currently hidden.",
-	"geo-bmapurl": "@geo-bmapurl@",
+	"geo-bmapurl": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
 	"geo-bmapttl": "BaseMaps_CBMT3978",
-	"geo-bmapurltxt": "@geo-bmapurltxt@",
+	"geo-bmapurltxt": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
 	"geo-attrlnk": "//geogratis.gc.ca/geogratis/CBM_CBC?lang=en",
 	"geo-attrttl": "GeoGratis - Canada Base Map",
 	"geo-sel": "Select",
