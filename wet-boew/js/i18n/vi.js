@@ -1,10 +1,10 @@
 /*
-* Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
-* wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
-*/
+ * Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
+ * wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
+ */
 /*
 ----- Vietnamese dictionary (il8n) ---
-*/
+ */
 ( function( wb ) {
 "use strict";
 
@@ -107,7 +107,6 @@ wb.i18nDict = {
 	"frm-nosubmit": "Dạng không thể được nộp bởi vì ",
 	"errs-fnd": " lỗi đã được tìm thấy.",
 	"err-fnd": " lỗi đã được tìm thấy.",
-	"err-correct": "(Correct and resubmit)",
 
 	/* Date picker */
 	"date-hide": "Ẩn lịch",
@@ -157,7 +156,6 @@ wb.i18nDict = {
 	/* Charts widget */
 	"tbl-txt": "Bảng",
 	"tbl-dtls": "Chart. Thông tin chi tiết trong bảng dưới đây.",
-	"chrt-cmbslc": "Combined slice",
 
 	/* Session timeout */
 	"st-to-msg-bgn": "Phiên của bạn sẽ tự động hết hạn trong  #min# phút #sec# giây.",
@@ -198,9 +196,9 @@ wb.i18nDict = {
 	"geo-allyttl": "Hướng dẫn: Bản đồ Navigation",
 	"geo-tgllyr": "Chuyển đổi các màn hình hiển thị của lớp",
 	"geo-hdnlyr": "Lớp này hiện đang ẩn!",
-	"geo-bmapurl": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
+	"geo-bmapurl": "@geo-bmapurl@",
 	"geo-bmapttl": "BaseMaps_CBMT3978",
-	"geo-bmapurltxt": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
+	"geo-bmapurltxt": "@geo-bmapurltxt@",
 	"geo-attrlnk": "//geogratis.gc.ca/geogratis/CBM_CBC?lang=en",
 	"geo-attrttl": "GeoGratis - Canada bản đồ cơ bản (tiếng Anh hoặc tiếng Pháp chỉ)",
 	"geo-sel": "Chọn",
@@ -240,16 +238,6 @@ wb.i18nDict = {
 } )( wb );
 
 wb.doc.one( "formLanguages.wb", function() {
-(function( factory ) {
-	if ( typeof define === "function" && define.amd ) {
-		define( ["jquery", "../jquery.validate"], factory );
-	} else if (typeof module === "object" && module.exports) {
-		module.exports = factory( require( "jquery" ) );
-	} else {
-		factory( jQuery );
-	}
-}(function( $ ) {
-
 /*
  * Translated default messages for the jQuery validation plugin.
  * Locale: VI (Vietnamese; Tiếng Việt)
@@ -273,7 +261,6 @@ $.extend( $.validator.messages, {
 	max: $.validator.format( "Hãy nhập từ {0} trở xuống." ),
 	min: $.validator.format( "Hãy nhập từ {1} trở lên." )
 } );
-return $;
-}));
+
 
 });

@@ -1,7 +1,7 @@
 /*!
  * Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
  * wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
- * v4.0.30 - 2023-01-09
+ * v4.0.26 - 2023-01-11
  *
  *//**
  * @title WET-BOEW JQuery Helper Methods
@@ -2108,9 +2108,6 @@ $document.on( "click vclick touchstart", ".cal-month-prev, .cal-month-next", fun
 		year: date.getFullYear(),
 		month: date.getMonth()
 	} );
-	if ( wb.ie11 ) {
-		$calendar.trigger( "focusin" );
-	}
 } );
 
 $document.on( "keydown", selector, function( event ) {
@@ -2371,29 +2368,6 @@ var componentName = "wb-charts",
 						grid: {
 							hoverable: true
 						}
-					},
-					slicelegend: {
-						base: "pie",
-						series: {
-							pie: {
-								radius: 1,
-								label: {
-									radius: 1,
-									show: true,
-									threshold: 0.05
-								},
-								combine: {
-									threshold: 0.05,
-									color: "#555",
-									label: i18nText.slicelegend
-								}
-							}
-						},
-						fn: {
-							"/series/pie/label/formatter": function( label ) {
-								return label;
-							}
-						}
 					}
 				},
 
@@ -2458,7 +2432,7 @@ var componentName = "wb-charts",
 							"/getcellvalue": function( elem ) {
 
 								// Get the number from the data cell, #3267
-								var cellValue = $.trim( elem.dataset.wbChartsValue || $( elem ).text() );
+								var cellValue = $.trim( $( elem ).text() );
 								return [
 									parseFloat( cellValue.replace( /(\d{1,3}(?:(?: |,)\d{3})*)(?:(?:.|,)(\d{1,2}))?$/, function( a, b, c ) {
 										return b.replace( / |,/g, "" ) + "." + c || "0";
@@ -3374,8 +3348,7 @@ var componentName = "wb-charts",
 				i18n = wb.i18n;
 				i18nText = {
 					tableMention: i18n( "hyphen" ) + i18n( "tbl-txt" ),
-					tableFollowing: i18n( "hyphen" ) + i18n( "tbl-dtls" ),
-					slicelegend: i18n( "chrt-cmbslc" )
+					tableFollowing: i18n( "hyphen" ) + i18n( "tbl-dtls" )
 				};
 			}
 
@@ -3452,7 +3425,7 @@ var componentName = "wb-collapsible",
 	selector = "details.alert",
 	initEvent = "wb-init." + componentName,
 	$document = wb.doc,
-	key,
+	details, key,
 
 	/**
 	 * @method init
@@ -3463,11 +3436,9 @@ var componentName = "wb-collapsible",
 		// Start initialization
 		// returns DOM object = proceed with init
 		// returns undefined = do not proceed with init (e.g., already initialized)
-		var details = wb.init( event, componentName, selector ),
-			$details;
+		details = wb.init( event, componentName, selector );
 
 		if ( details ) {
-			$details = $( details );
 
 			key = "alert-collapsible-state-" + details.getAttribute( "id" );
 
@@ -3496,53 +3467,56 @@ var componentName = "wb-collapsible",
 			} catch ( e ) {}
 
 			// Identify that initialization has completed
-			wb.ready( $details, componentName );
+			wb.ready( $document, componentName );
 		}
 	};
 
 // Bind the init event of the plugin
 $document.on( "timerpoke.wb " + initEvent, selector, init );
 
-// Do not bind events if details polyfill is active
-if ( Modernizr.details ) {
+$document.on( "timerpoke.wb", function() {
 
-	// Bind the the event handlers of the plugin
-	$document.on( "click keydown toggle." + componentName, selector + " summary", function( event ) {
-		var which = event.which,
-			currentTarget = event.currentTarget,
-			isClosed,
-			details;
+	// Do not bind events if details polyfill is active
+	if ( Modernizr.details ) {
 
-		// Ignore middle/right mouse buttons and wb-toggle enhanced summary elements (except for toggle)
-		if ( ( !which || which === 1 ) &&
-			( currentTarget.className.indexOf( "wb-toggle" ) === -1 ||
-			( event.type === "toggle" && event.namespace === componentName ) ) ) {
+		// Bind the the event handlers of the plugin
+		$document.on( "click keydown toggle." + componentName, selector + " summary", function( event ) {
+			var which = event.which,
+				currentTarget = event.currentTarget,
+				isClosed;
 
-			details = currentTarget.parentNode;
-			isClosed = details.getAttribute( "open" ) === null;
-			key = "alert-collapsible-state-" + details.getAttribute( "id" );
+			// Ignore middle/right mouse buttons and wb-toggle enhanced summary elements (except for toggle)
+			if ( ( !which || which === 1 ) &&
+				( currentTarget.className.indexOf( "wb-toggle" ) === -1 ||
+				( event.type === "toggle" && event.namespace === componentName ) ) ) {
 
-			if ( isClosed ) {
-				try {
-					localStorage.setItem( key, "open" );
-				} catch ( e ) {}
-			} else {
-				try {
-					localStorage.setItem( key, "closed" );
-				} catch ( e ) {}
+				details = currentTarget.parentNode;
+				isClosed = details.getAttribute( "open" ) === null;
+				key = "alert-collapsible-state-" + details.getAttribute( "id" );
+
+				if ( isClosed ) {
+					try {
+						localStorage.setItem( key, "open" );
+					} catch ( e ) {}
+				} else {
+					try {
+						localStorage.setItem( key, "closed" );
+					} catch ( e ) {}
+				}
+			} else if ( which === 13 || which === 32 ) {
+				event.preventDefault();
+				$( currentTarget ).trigger( "click" );
 			}
-		} else if ( which === 13 || which === 32 ) {
-			event.preventDefault();
-			$( currentTarget ).trigger( "click" );
-		}
 
-		/*
-		 * Since we are working with events we want to ensure that we are being passive about our control,
-		 * so returning true allows for events to always continue
-		 */
-		return true;
-	} );
-}
+			/*
+			 * Since we are working with events we want to ensure that we are being passive about our control,
+			 * so returning true allows for events to always continue
+			 */
+			return true;
+		} );
+	}
+
+} );
 
 // Add the timer poke to initialize the plugin
 wb.add( selector );
@@ -3616,7 +3590,7 @@ var componentName = "wb-ctrycnt",
 
 			// From https://github.com/aFarkas/webshim/blob/master/src/shims/geolocation.js#L89-L127
 			$.ajax( {
-				url: "https://freegeoip.net/json/",
+				url: "http://freegeoip.net/json/",
 				dataType: "jsonp",
 				cache: true,
 				jsonp: "callback",
@@ -4801,9 +4775,9 @@ var componentName = "wb-feeds",
 
 			// due to CORS we cannot default to simple ajax pulls of the image. We have to inline the content box
 			return "<li><a class='feed-flickr' href='javascript:;' data-flickr='" +
-				wb.escapeAttribute( JSON.stringify( flickrData ) ) + "'><img src='" + flickrData.thumbnail + "' alt='" +
-				wb.escapeAttribute( flickrData.title ) + "' title='" + wb.escapeAttribute( flickrData.title ) +
-				"' class='img-responsive'/></a></li>";
+                wb.escapeAttribute( JSON.stringify( flickrData ) ) + "'><img src='" + flickrData.thumbnail + "' alt='" +
+                wb.escapeAttribute( flickrData.title ) + "' title='" + wb.escapeAttribute( flickrData.title ) +
+                "' class='img-responsive'/></a></li>";
 		},
 
 		/**
@@ -4819,10 +4793,10 @@ var componentName = "wb-feeds",
 
 			// Due to CORS we cannot default to simple ajax pulls of the image. We have to inline the content box
 			return "<li class='col-md-4 col-sm-6 feed-youtube' data-youtube='" +
-				wb.escapeAttribute( JSON.stringify( youtubeDate ) ) + "'><a href='javascript:;'><img src='" +
-				wb.pageUrlParts.protocol + "//img.youtube.com/vi/" + youtubeDate.videoId + "/mqdefault.jpg' alt='" +
-				wb.escapeAttribute( youtubeDate.title ) + "' title='" + wb.escapeAttribute( youtubeDate.title ) +
-				"' class='img-responsive' /></a></li>";
+                wb.escapeAttribute( JSON.stringify( youtubeDate ) ) + "'><a href='javascript:;'><img src='" +
+                wb.pageUrlParts.protocol + "//img.youtube.com/vi/" + youtubeDate.videoId + "/mqdefault.jpg' alt='" +
+                wb.escapeAttribute( youtubeDate.title ) + "' title='" + wb.escapeAttribute( youtubeDate.title ) +
+                "' class='img-responsive' /></a></li>";
 		},
 
 		/**
@@ -4832,7 +4806,7 @@ var componentName = "wb-feeds",
 		 */
 		pinterest: function( data ) {
 			var content = fromCharCode( data.description ).replace( /<a href="\/pin[^"]*"><img ([^>]*)><\/a>([^<]*)(<a .*)?/, "<a href='" +
-				data.link + "'><img alt='' class='center-block' $1><br/>$2</a>$3" );
+                data.link + "'><img alt='' class='center-block' $1><br/>$2</a>$3" );
 			return "<li class='media'>" + content +
 			( data.publishedDate !== "" ? " <small class='small feeds-date'><time>" +
 			wb.date.toDateISO( data.publishedDate, true ) + "</time></small>" : "" ) + "</li>";
@@ -4846,12 +4820,8 @@ var componentName = "wb-feeds",
 		generic: function( data ) {
 			var title = data.title;
 
-			if ( typeof( title ) === "object" ) {
-				if ( title.content ) {
-					title = title.content;
-				} else if ( title.type === "xhtml" && title.div ) {
-					title = title.div.content;
-				}
+			if ( typeof( title ) === "object" && title.content ) {
+				title = title.content;
 			}
 			return "<li><a href='" + data.link + "'>" + title + "</a><br />" +
 				( data.publishedDate !== "" ? " <small class='feeds-date'><time>" +
@@ -4895,6 +4865,21 @@ var componentName = "wb-feeds",
 	},
 
 	/**
+	 * Helper function that builds the URL for the JSON request
+	 * Feeds well now use developer.yahoo.com/yql/console/ since ajax.googleapis.com/ajax/services/feed/ was depercated.
+	 * @method jsonRequest
+	 * @param {url} url URL of the feed.
+	 * @param {integer} limit Limit on the number of results for the JSON request to return.
+	 * @return {url} The URL for the JSON request
+	 */
+	jsonRequest = function( url, limit ) {
+
+		var requestURL = wb.pageUrlParts.protocol + "//query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%20%3D%20'" + encodeURIComponent( decodeURIComponent( url ) ) + "'%20limit%20" + ( limit ? limit : 4 ) + "&format=json";
+
+		return requestURL;
+	},
+
+	/**
 	 * @method init
 	 * @param {jQuery Event} event Event that triggered the function call
 	 */
@@ -4904,10 +4889,10 @@ var componentName = "wb-feeds",
 		// returns DOM object = proceed with init
 		// returns undefined = do not proceed with init (e.g., already initialized)
 		var elm = wb.init( event, componentName, selector ),
-			fetch, url, $content, limit, feeds, fType, last, i, callback, fElem, fIcon, youtubeData, $elm;
+			fetch, url, $content, limit, feeds, fType, last, i, callback, fElem, fIcon, youtubeData;
+
 		if ( elm ) {
-			$elm = $( elm );
-			$content = $elm.find( ".feeds-cont" );
+			$content = $( elm ).find( ".feeds-cont" );
 			limit = getLimit( elm );
 			feeds = $content.find( feedLinkSelector );
 			last = feeds.length - 1;
@@ -4935,8 +4920,7 @@ var componentName = "wb-feeds",
 						$content.data( componentName + "-postProcess", [ ".wb-lbx" ] );
 					} else {
 						fType = "generic";
-						callback = false;
-						fetch.dataType = "json";
+						callback = "callback";
 					}
 
 					// We need a Gallery so lets add another plugin
@@ -4959,9 +4943,7 @@ var componentName = "wb-feeds",
 					}
 
 				} else {
-
-					url = fElem.attr( "href" );
-					fetch.dataType = "xml";
+					url = jsonRequest( fElem.attr( "href" ), limit );
 					fetch.url = url;
 
 					// Let's bind the template to the Entries
@@ -4989,78 +4971,10 @@ var componentName = "wb-feeds",
 	},
 
 	/**
-	 * Process Feed/JSON Entries for CORS Enabled
-	 * @method corsEntry
-	 */
-	corsEntry = function( xmlDoc, limit ) {
-		var arr_entry = [],
-			corsObj = {},
-			limit = limit,
-			jsonString = JSON.stringify( xmlToJson( xmlDoc ) ),
-			jsonObj = JSON.parse( jsonString ),
-			i, iCache;
-		for ( i = 0; i < limit; i++ ) {
-			iCache = jsonObj.feed.entry[ i ];
-			corsObj = {
-				title: iCache.title[ "#text" ],
-				link: iCache.id[ "#text" ],
-				updated: iCache.updated[ "#text" ]
-			};
-			arr_entry.push( corsObj );
-		}
-		return arr_entry;
-	},
-
-	/**
-	 * Process XML to JSON
-	 * @method xmlToJson
-	 * @param  {xml}
-	 */
-	xmlToJson = function( xml ) {
-
-		var obj = {},
-			i, iCache, nodeName, old,
-			xmlAttributes, xmlChildNodes,
-			xmlNodeType = xml.nodeType;
-
-		if ( xmlNodeType === 1 ) {
-			xmlAttributes = xml.attributes;
-			if ( xmlAttributes.length ) {
-				obj[ "@attributes" ] = {};
-				for ( i = 0; i < xmlAttributes.length; i++ ) {
-					iCache = xmlAttributes.item( i );
-					obj[ "@attributes" ][ iCache.nodeName ] = iCache.nodeValue;
-				}
-			}
-		} else if ( xmlNodeType === 3 ) {
-			obj = xml.nodeValue;
-		}
-
-		if ( xml.hasChildNodes() ) {
-			xmlChildNodes = xml.childNodes;
-			for ( i = 0; i < xmlChildNodes.length; i++ ) {
-				iCache = xmlChildNodes.item( i );
-				nodeName = iCache.nodeName;
-				if ( typeof( obj[ nodeName ] ) === "undefined" ) {
-					obj[ nodeName ] = xmlToJson( iCache );
-				} else {
-					if ( typeof( obj[ nodeName ].push ) === "undefined" ) {
-						old = obj[ nodeName ];
-						obj[ nodeName ] = [];
-						obj[ nodeName ].push( old );
-					}
-					obj[ nodeName ].push( xmlToJson( iCache ) );
-				}
-			}
-		}
-		return obj;
-	},
-
-	/**
 	 * Process Feed/JSON Entries
 	 * @method processEntries
 	 * @param  {data} JSON formatted data to process
-	 * @return {string} of HTML output
+	 * @return {string}	of HTML output
 	 */
 	processEntries = function( data ) {
 		var items = data,
@@ -5203,21 +5117,20 @@ var componentName = "wb-feeds",
 
 $document.on( "ajax-fetched.wb data-ready.wb-feeds", selector + " " + feedLinkSelector, function( event, context ) {
 	var eventTarget = event.target,
-		data, response, $emlRss, limit, results;
+		data, response;
 
 	// Filter out any events triggered by descendants
 	if ( event.currentTarget === eventTarget ) {
-		$emlRss = $( eventTarget ).parentsUntil( selector ).parent();
 		switch ( event.type ) {
 		case "ajax-fetched":
 			response = event.fetch.response;
-			if ( response.documentElement ) {
-				limit = getLimit( $emlRss[ Object.keys( $emlRss )[ 0 ] ] );
-				data = corsEntry( response, limit );
-			} else if ( response.query ) {
-				results = response.query.results;
-				if ( !results ) {
-					data = results.item; // Flicker feeds
+
+			if ( response.query ) {
+				var results = response.query.results;
+
+				if ( results ) {
+					data = results.entry ? results.entry : results.item;
+
 					if ( !Array.isArray( data ) ) {
 						data = [ data ];
 					}
@@ -5227,6 +5140,7 @@ $document.on( "ajax-fetched.wb data-ready.wb-feeds", selector + " " + feedLinkSe
 			} else {
 				data = ( response.responseData ) ? response.responseData.feed.entries : response.items || response.feed.entry;
 			}
+
 			break;
 		default:
 			data = event.feedsData;
@@ -5405,89 +5319,25 @@ var componentName = "wb-filter",
 			replace( /_NBITEM_/g, nbItem ).
 			replace( /_TOTAL_/g, total );
 	},
-
-	/*
-	 * Takes in the text from the filter box
-	 * Returns:
-	 *  An array of search words
-	 *      Special characters are escaped
-	 *      Double and single quotes removed
-	 */
-	filterQueryParser = function( filter ) {
-
-		// Pattern to seperate the filter text into "words"
-		var pattern = /[^\s"]+|"([^"]*)"/gi;
-
-		// Make strings safe again for regex
-		// Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-		filter = filter.replace( /[.*+?^${}()|[\]\\]/g, "\\$&" );
-
-		// Apply the word match pattern and return
-		return filter.match( pattern );
-	},
-
-	/**
-	 * Build the Regular Expression that we are going
-	 * to use to filter content
-	 * This involves identifying the type of search being
-	 * applied and then breaking up the search string into
-	 * words
-	 */
-	buildSearchFilterRegularExp =  function( filterType, filter ) {
-
-		var words, wordRegExFilter = filter,
-			i, i_len;
-
-		switch ( filterType ) {
-
-		case "and":
-			words = filterQueryParser( filter );
-			if ( words ) {
-				wordRegExFilter = ".*";
-				i_len = words.length;
-				for ( i = 0; i < i_len; i++ ) {
-					wordRegExFilter = wordRegExFilter + ( "(?=.*" + words[ i ] + ")" );
-				}
-			}
-			break;
-
-		case "or": // If one word fall back on default
-			words = filterQueryParser( filter );
-			if ( words ) {
-				wordRegExFilter =  words.join( "|" );
-			}
-			break;
-
-		default:
-			break;
-
-		}
-
-		return new RegExp( wordRegExFilter, "i" );
-
-	},
-
 	filter = function( $field, $elm, settings ) {
 		var unAccent = function( str ) {
 				return str.normalize( "NFD" ).replace( /[\u0300-\u036f]/g, "" );
 			},
-			filter = unAccent( $field.val().trim() ),
+			filter = unAccent( $field.val() ),
 			fCallBack = settings.filterCallback,
 			secSelector = ( settings.section || "" )  + " ",
 			hndParentSelector = settings.hdnparentuntil,
 			$items = $elm.find( secSelector + settings.selector ),
 			itemsLength = $items.length,
-			i, $item, text, searchFilterRegularExp;
+			i, $item, text;
 
 		$elm.find( "." + filterClass ).removeClass( filterClass );
-
-		searchFilterRegularExp = buildSearchFilterRegularExp( settings.filterType, filter );
 
 		for ( i = 0; i < itemsLength; i += 1 ) {
 			$item = $items.eq( i );
 			text = unAccent( $item.text() );
 
-			if ( !text.match( searchFilterRegularExp ) ) {
+			if ( !text.match( new RegExp( filter, "i" ) ) ) {
 				if ( hndParentSelector ) {
 					$item = $item.parentsUntil( hndParentSelector );
 				}
@@ -5649,11 +5499,11 @@ wb.add( selector );
 "use strict";
 
 /*
-* Variable and function definitions.
-* These are global to the plugin - meaning that they will be initialized once per page,
-* not once per instance of plugin on the page. So, this is a good place to define
-* variables that are common to all instances of the plugin on a page.
-*/
+ * Variable and function definitions.
+ * These are global to the plugin - meaning that they will be initialized once per page,
+ * not once per instance of plugin on the page. So, this is a good place to define
+ * variables that are common to all instances of the plugin on a page.
+ */
 var componentName = "wb-frmvld",
 	selector = "." + componentName,
 	initEvent = "wb-init" + selector,
@@ -5701,8 +5551,7 @@ var componentName = "wb-frmvld",
 					error: i18n( "err" ),
 					errorFound: i18n( "err-fnd" ),
 					errorsFound: i18n( "errs-fnd" ),
-					formNotSubmitted: i18n( "frm-nosubmit" ),
-					errorCorrect: i18n( "err-correct" )
+					formNotSubmitted: i18n( "frm-nosubmit" )
 				};
 			}
 
@@ -5713,9 +5562,6 @@ var componentName = "wb-frmvld",
 					"site!deps/jquery.validate" + modeJS,
 					"site!deps/additional-methods" + modeJS
 				],
-				testReady: function() {
-					return ( $.validator && $.validator.methods.bic );
-				},
 				complete: function() {
 					var $elm = $( "#" + elmId ),
 						$form = $elm.find( "form" ),
@@ -5829,13 +5675,6 @@ var componentName = "wb-frmvld",
 								}
 							}
 
-							//Std If we have a label and the input field is inside the label
-							// need to add a css-implicite-input
-							if ( $form.find( "label" ).find( "input[name='" + $element.attr( "name" ) + "']" ).length > 0 ) {
-								$error.insertBefore( $form.find( "input[name='" + $element.attr( "name" ) + "']" ) );
-								return;
-							}
-
 							$error.appendTo( $form.find( "label[for='" + $element.attr( "id" ) + "']" ) );
 							return;
 						},
@@ -5843,7 +5682,7 @@ var componentName = "wb-frmvld",
 						// Create our error summary that will appear before the form
 						showErrors: function( errorMap ) {
 							this.defaultShowErrors();
-							var $errors = $form.find( ".wb-server-error, strong.error" ).filter( ":not(:hidden)" ),
+							var $errors = $form.find( "strong.error" ).filter( ":not(:hidden)" ),
 								$errorfields = $form.find( "input.error, select.error, textarea.error" ),
 								prefixStart = "<span class='prefix'>" + i18nText.error + "&#160;",
 								prefixEnd = i18nText.colon + " </span>",
@@ -5854,8 +5693,8 @@ var componentName = "wb-frmvld",
 							// Correct the colouring of fields that are no longer invalid
 							$form
 								.find( ".has-error [aria-invalid=false]" )
-								.closest( ".has-error" )
-								.removeClass( "has-error" );
+									.closest( ".has-error" )
+										.removeClass( "has-error" );
 
 							if ( $errors.length !== 0 ) {
 
@@ -5864,12 +5703,12 @@ var componentName = "wb-frmvld",
 									i18nText.formNotSubmitted + $errors.length +
 									(
 										$errors.length !== 1 ?
-										i18nText.errorsFound :
-										i18nText.errorFound
+											i18nText.errorsFound :
+											i18nText.errorFound
 									) + "</" + summaryHeading + "><ul>";
 								$errorfields
 									.closest( ".form-group" )
-									.addClass( "has-error" );
+										.addClass( "has-error" );
 								len = $errors.length;
 								for ( i = 0; i !== len; i += 1 ) {
 									$error = $errors.eq( i );
@@ -5885,34 +5724,10 @@ var componentName = "wb-frmvld",
 									}
 
 									$error.find( "span.prefix" ).detach();
-
-									//Verify if it is a wb-server-error
-									if ( $errors[ i ].classList.contains( "wb-server-error" ) ) {
-										if ( $errors[ i ].id ) {
-											var myParent = document.getElementById( $errors[ i ].id ).parentElement;
-											if ( myParent === null ) {
-												summary += "<li><a>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) + $error.text() + separator + i18nText.errorCorrect + "</a></li>";
-											} else {
-												if ( myParent.hasAttribute( "for" ) && myParent.getAttribute( "for" ).length > 0 ) {
-													summary += "<li><a href='#" + myParent.getAttribute( "for" ) + "'>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) + $error.text() + separator + i18nText.errorCorrect + "</a></li>";
-												} else {
-													if ( myParent.getElementsByTagName( "input" )[ 0 ] && myParent.getElementsByTagName( "input" )[ 0 ].name.length > 0 ) {
-														summary += "<li><a href='#" + myParent.getElementsByTagName( "input" )[ 0 ].id + "'>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) + $error.text() + separator + i18nText.errorCorrect + "</a></li>";
-													} else {
-														if ( myParent.tagName === ( "LEGEND" ) && ( myParent.parentElement.getElementsByTagName( "input" )[ 0 ].type === "checkbox" || myParent.parentElement.getElementsByTagName( "input" )[ 0 ].type === "radio" && myParent.parentElement.getElementsByTagName( "input" )[ 0 ].name.length > 0 ) ) {
-															summary += "<li><a href='#" + myParent.parentElement.getElementsByTagName( "input" )[ 0 ].id + "'>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) + $error.text() + separator + i18nText.errorCorrect + "</a></li>";
-														} else {
-															summary += "<li><a>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) + $error.text() + separator + i18nText.errorCorrect + "</a></li>";
-														}
-													}
-												}
-											}
-											$error.html( "<strong>" + prefix + $error.text() + "</strong>" );
-										}
-									} else {
-										summary += "<li><a href='#" + $error.data( "element-id" ) + "'>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) + $error.text() + "</a></li>";
-										$error.html( "<span class='label label-danger'>" + prefix + $error.text() + "</span>" );
-									}
+									summary += "<li><a href='#" + $error.data( "element-id" ) +
+										"'>" + prefix + ( $fieldName.length !== 0 ? $fieldName.html() + separator : "" ) +
+										$error.text() + "</a></li>";
+									$error.html( "<span class='label label-danger'>" + prefix + $error.text() + "</span>" );
 								}
 								summary += "</ul>";
 
@@ -5971,9 +5786,8 @@ var componentName = "wb-frmvld",
 								}
 								$form.find( "#" + errorFormId ).detach();
 							}
-						},
 
-						/* End of showErrors() */
+						}, /* End of showErrors() */
 
 						invalidHandler: function() {
 							submitted = true;
@@ -6008,19 +5822,6 @@ var componentName = "wb-frmvld",
 
 							// Correct the colouring of fields that are no longer invalid
 							$form.find( ".has-error" ).removeClass( "has-error" );
-						}
-					} );
-
-					//Trigger validation on wb-server-error
-					$form.find( ".wb-server-error" ).filter( ":not( :hidden )" ).parent().each( function() {
-						if ( this.attributes.for && this.attributes.for.value.length > 0 ) {
-							$( "form" ).validate().element( $( "[id =" + this.attributes.for.value + "]" ) );
-						} else if ( $( this ).find( "input" )[ 0 ] ) {
-							$( "form" ).validate().element( $( this ).find( "input" )[ 0 ] );
-						} else if ( $( this ).next( ".radio, .checkbox" ).children( "label" ).children( "input" )[ 0 ] ) {
-							if ( $( this ).find( $( this ).next( ".radio, .checkbox" ).children( "label" ).children( "input " )[ 0 ].id ) ) {
-								$( "form" ).validate().element( $( this ).next( ".radio, .checkbox" ).children( "label" ).children( "input" )[ 0 ] );
-							}
 						}
 					} );
 
@@ -6261,8 +6062,8 @@ var componentName = "wb-lbx",
 					}
 
 					$wrap.append( "<span tabindex='0' class='lbx-end wb-inv'></span>" )
-						.find( ".activate-open" )
-						.trigger( "wb-activate" );
+                        .find( ".activate-open" )
+                        .trigger( "wb-activate" );
 
 					this.contentContainer.attr( "data-pgtitle", document.getElementsByTagName( "H1" )[ 0 ].textContent );
 				},
@@ -6348,9 +6149,6 @@ var componentName = "wb-lbx",
 		// Load Magnific Popup dependency and bind the init event handler
 		Modernizr.load( {
 			load: "site!deps/jquery.magnific-popup" + wb.getMode() + ".js",
-			testReady: function() {
-				return $.magnificPopup;
-			},
 			complete: function() {
 
 				// Set the dependency i18nText only once
@@ -6379,7 +6177,7 @@ var componentName = "wb-lbx",
 				}
 				spanTextFtr = spanTextFtr.replace( "'", "&#39;" );
 
-				overlayCloseFtr = "<button type='button' class='btn btn-sm btn-primary pull-left " + closeClassFtr +
+				overlayCloseFtr = "<button type='button' id='ftrClose' class='btn btn-sm btn-primary pull-left " + closeClassFtr +
 					"' title='" + closeTextFtr + " " + spanTextFtr + "'>" +
 					closeTextFtr +
 					"<span class='wb-inv'>" + spanTextFtr + "</span></button>";
@@ -6406,19 +6204,23 @@ $document.on( "click vclick", ".mfp-wrap a[href^='#']", function( event ) {
 		$lightbox = $( eventTarget ).closest( ".mfp-wrap" );
 		linkTarget = document.getElementById( eventTarget.getAttribute( "href" ).substring( 1 ) );
 
-		// Ignore same page links to within the overlay
+		// Ignore same page links to within the overlay and modal popups
 		if ( linkTarget && !$.contains( $lightbox[ 0 ], linkTarget ) ) {
+			if ( $lightbox.find( ".popup-modal-dismiss" ).length === 0 ) {
 
-			// Stop propagation of the click event
-			if ( event.stopPropagation ) {
-				event.stopImmediatePropagation();
+				// Stop propagation of the click event
+				if ( event.stopPropagation ) {
+					event.stopImmediatePropagation();
+				} else {
+					event.cancelBubble = true;
+				}
+
+				// Close the overlay and set focus to the same page link
+				$.magnificPopup.close();
+				$( linkTarget ).trigger( setFocusEvent );
 			} else {
-				event.cancelBubble = true;
+				return false;
 			}
-
-			// Close the overlay and set focus to the same page link
-			$.magnificPopup.close();
-			$( linkTarget ).trigger( setFocusEvent );
 		}
 	}
 } );
@@ -6555,8 +6357,6 @@ var componentName = "wb-menu",
 			$subMenu = $elm.siblings( "ul" );
 
 			$elm.attr( {
-				"aria-posinset": ( i + 1 ),
-				"aria-setsize": length,
 				role: "menuitem"
 			} );
 
@@ -6585,12 +6385,11 @@ var componentName = "wb-menu",
 		// Use details/summary for the collapsible mechanism
 		var k, $elm, elm, $item, $subItems, subItemsLength,
 			$section = $( section ),
-			posinset = "' aria-posinset='",
-			menuitem = " role='menuitem' aria-setsize='",
+			menuitem = " role='menuitem'",
 			sectionHtml = "<li><details>" + "<summary class='mb-item" +
 				( $section.hasClass( "wb-navcurr" ) || $section.children( ".wb-navcurr" ).length !== 0 ? " wb-navcurr'" : "'" ) +
-				menuitem + sectionsLength + posinset + ( sectionIndex + 1 ) +
-				"' aria-haspopup='true'>" + $section.text() + "</summary>" +
+				" aria-haspopup='true'><span" + menuitem + ">" +
+				$section.text() + "</span></summary>" +
 				"<ul class='list-unstyled mb-sm' role='menu' aria-expanded='false' aria-hidden='true'>";
 
 		// Convert each of the list items into WAI-ARIA menuitems
@@ -6604,9 +6403,8 @@ var componentName = "wb-menu",
 			if ( elm && subItemsLength === 0 && elm.nodeName.toLowerCase() === "a" ) {
 				sectionHtml += "<li>" + $item[ 0 ].innerHTML.replace(
 						/(<a\s)/,
-						"$1" + menuitem + itemsLength +
-							posinset + ( k + 1 ) +
-							"' tabindex='-1' "
+						"$1" + menuitem +
+							" tabindex='-1' "
 					) + "</li>";
 			} else {
 				sectionHtml += createCollapsibleSection( elm, k, itemsLength, $subItems, $subItems.length );
@@ -6648,11 +6446,7 @@ var componentName = "wb-menu",
 					if ( parent.nodeName.toLowerCase() === "li" ) {
 						linkHtml = parent.innerHTML;
 
-					// Non-list menu items without a section and that contain their own link
-					} else if ( parent.getElementsByTagName( "a" )[ 0 ] === section.getElementsByTagName( "a" )[ 0 ] ) {
-						linkHtml = section.innerHTML;
-
-					// Non-list menu item without a section and whose siblings contain a link
+					// Non-list menu item without a section
 					} else {
 						linkHtml = "<a href='" +
 							parent.getElementsByTagName( "a" )[ 0 ].href + "'>" +
@@ -6663,9 +6457,8 @@ var componentName = "wb-menu",
 					sectionHtml += "<li class='no-sect'>" +
 						linkHtml.replace(
 							/(<a\s)/,
-							"$1 class='mb-item' " + "role='menuitem' aria-setsize='" +
-								sectionsLength + "' aria-posinset='" + ( j + 1 ) +
-								"' tabindex='-1' "
+							"$1 class='mb-item' " + "role='menuitem'" +
+								" tabindex='-1' "
 						) + "</li>";
 				}
 			}
@@ -6781,21 +6574,21 @@ var componentName = "wb-menu",
 				}
 
 				// Let's now populate the DOM since we have done all the work in a documentFragment
-				panelDOM.innerHTML = "<header class='modal-header'><div class='modal-title'>" +
+				panelDOM.innerHTML = "<div class='modal-header'><div class='modal-title'>" +
 						document.getElementById( "wb-glb-mn" )
 							.getElementsByTagName( "h2" )[ 0 ]
 								.innerHTML +
-						"</div></header><div class='modal-body'>" + panel + "</div>";
+						"</div></div><div class='modal-body'>" + panel + "</div>";
 				panelDOM.className += " wb-overlay modal-content overlay-def wb-panel-r";
-
-				// fix #8241
-				if ( $.active > 0 ) {
-					$( document ).ajaxStop( function() {
-						initOverlay( $panel );
-					} );
-				} else {
-					initOverlay( $panel );
-				}
+				$panel
+					.trigger( "wb-init.wb-overlay" )
+					.find( "summary" )
+						.attr( "tabindex", "-1" )
+						.trigger( detailsInitEvent );
+				$panel
+					.find( ".mb-menu > li:first-child" )
+						.find( ".mb-item" )
+							.attr( "tabindex", "0" );
 
 				/*
 				 * Build the regular mega menu
@@ -6865,23 +6658,6 @@ var componentName = "wb-menu",
 		}
 	},
 
-	// fix #8517
-	/**
-	 * @method initOverlay
-	 * @param {jQuery object} $panel Current panel
-	 */
-	initOverlay = function( $panel ) {
-		$panel
-			.trigger( "wb-init.wb-overlay" )
-			.find( "summary" )
-			.attr( "tabindex", "-1" )
-			.trigger( detailsInitEvent );
-		$panel
-			.find( ".mb-menu > li:first-child" )
-			.find( ".mb-item" )
-			.attr( "tabindex", "0" );
-	},
-
 	/**
 	 * @method menuIncrement
 	 * @param {jQuery object} $menuItems Collection of of menu items to move between
@@ -6912,16 +6688,7 @@ var componentName = "wb-menu",
 				.attr( {
 					"aria-hidden": "true",
 					"aria-expanded": "false"
-				} )
-
-				// Close nested submenus
-				.find( "details" )
-					.removeAttr( "open" )
-					.children( "ul" )
-						.attr( {
-							"aria-hidden": "true",
-							"aria-expanded": "false"
-						} );
+				} );
 
 		if ( removeActive ) {
 			$elm.removeClass( "active" );
@@ -6938,14 +6705,12 @@ var componentName = "wb-menu",
 
 		menuClose( $elm.find( ".active" ), true );
 
-		menu.addClass( "active" );
-
 		// Ignore if doesn't have a submenu
 		if ( menuLink.attr( "aria-haspopup" ) === "true" ) {
 
 			// Add the open state classes
 			menu
-				.addClass( "sm-open" )
+				.addClass( "active sm-open" )
 				.children( ".sm" )
 					.addClass( "open" )
 					.attr( {
@@ -7132,44 +6897,26 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 		$menuLink, $parentMenu, $parent, $subMenu, result,
 		menuitemSelector, isOpen, menuItemOffsetTop, menuContainer;
 
-	// Define keycodes. (Make const when WET supports ES6)
-	var TAB_KC = 9,
-		ENTER_KC = 13,
-		ESC_KC = 27,
-		LEFT_KC = 37,
-		UP_KC = 38,
-		RIGHT_KC = 39,
-		DOWN_KC = 40,
-		SPACE_KC = 32;
-
 	if ( !( event.ctrlKey || event.altKey || event.metaKey ) ) {
 
 		// Tab key = Hide all sub-menus
-		if ( which === TAB_KC ) {
-			menuClose( $( selector + " .active" ), true );
-
-		//Enter or spacebar on a link = follow the link and close menus
-		} else if ( menuItem.nodeName === "A" && menuItem.hasAttribute( "href" ) &&
-			( which === ENTER_KC || which === SPACE_KC ) ) {
-
-			event.preventDefault();
-			menuItem.click();
+		if ( which === 9 ) {
 			menuClose( $( selector + " .active" ), true );
 
 		// Menu item is within a menu bar
 		} else if ( inMenuBar ) {
 
 			// Left / right arrow = Previous / next menu item
-			if ( which === LEFT_KC || which === RIGHT_KC ) {
+			if ( which === 37 || which === 39 ) {
 				event.preventDefault();
 				menuIncrement(
 					$menu.find( "> li > a" ),
 					$menuItem,
-					which === LEFT_KC ? -1 : 1
+					which === 37 ? -1 : 1
 				);
 
 			// Enter sub-menu
-			} else if ( hasPopup && ( which === ENTER_KC || which === SPACE_KC || which === UP_KC || which === DOWN_KC ) ) {
+			} else if ( hasPopup && ( which === 13 || which === 38 || which === 40 ) ) {
 				event.preventDefault();
 				$parent = $menuItem.parent();
 				$subMenu = $parent.find( ".sm" );
@@ -7183,7 +6930,7 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 				$subMenu.children( "li" ).eq( 0 ).find( menuItemSelector ).trigger( focusEvent );
 
 			// Hide sub-menus and set focus
-			} else if ( which === ESC_KC ) {
+			} else if ( which === 27 ) {
 				event.preventDefault();
 				menuClose( $menu.closest( selector ).find( ".active" ), false );
 
@@ -7192,7 +6939,7 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 				event.preventDefault();
 				selectByLetter(
 					which,
-					$menuItem.parent().find( "> ul > li > a, > ul > li > details > summary" ).get()
+					$menuItem.parent().find( "> ul > li > a" ).get()
 				);
 			}
 
@@ -7201,21 +6948,21 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 			menuitemSelector = menuItemSelector;
 
 			// Up / down arrow = Previous / next menu item
-			if ( which === UP_KC || which === DOWN_KC ) {
+			if ( which === 38 || which === 40 ) {
 				event.preventDefault();
 				menuIncrement(
 					$menu.children( "li" ).find( menuitemSelector ),
 					$menuItem,
-					which === UP_KC ? -1 : 1
+					which === 38 ? -1 : 1
 				);
 
-			// Enter, space, or right arrow with a submenu
-			} else if ( hasPopup && ( which === ENTER_KC || which === SPACE_KC || which === RIGHT_KC ) ) {
+			// Enter or right arrow with a submenu
+			} else if ( hasPopup && ( which === 13 || which === 39 ) ) {
 				$parent = $menuItem.parent();
 
-				// Prevent handling by details.js polyfill
-				event.stopImmediatePropagation();
-				event.preventDefault();
+				if ( which === 39 ) {
+					event.preventDefault();
+				}
 
 				// If the menu item is a summary element
 				if ( menuItem.nodeName.toLowerCase( "summary" ) ) {
@@ -7239,8 +6986,10 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 
 							menuContainer.scrollTop = menuItemOffsetTop;
 						}
+					}
 
-						// Ensure the menu is opened or stays open
+					// Ensure the menu is opened or stays open
+					if ( ( !isOpen && which === 39 ) || ( isOpen && which === 13 ) ) {
 						$menuItem.trigger( "click" );
 					}
 
@@ -7256,19 +7005,19 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 				}
 
 			// Escape, left / right arrow without a submenu
-			} else if ( which === ESC_KC || which === LEFT_KC || which === RIGHT_KC ) {
+			} else if ( which === 27 || which === 37 || which === 39 ) {
 				$parent = $menu.parent();
 				$parentMenu = $parent.closest( "[role^='menu']" );
-				if ( which === LEFT_KC || which === RIGHT_KC ) {
+				if ( which === 37 || which === 39 ) {
 					event.preventDefault();
 				}
 
 				// If the parent menu is a menubar
 				if ( $parentMenu.attr( "role" ) === "menubar" ) {
-					$menuLink = $menu.siblings( "a" );
+					$menuLink = $parent.children( "[href=#" + $menu.attr( "id" ) + "]" );
 
 					// Escape key = Close menu and return to menu bar item
-					if ( which === ESC_KC ) {
+					if ( which === 27 ) {
 						event.preventDefault();
 						$menuLink.trigger( focusEvent );
 
@@ -7282,13 +7031,13 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 						menuIncrement(
 							$parentMenu.find( "> li > a" ),
 							$menuLink,
-							which === LEFT_KC ? -1 : 1
+							which === 37 ? -1 : 1
 						);
 					}
 
 				// Escape or left arrow: Go up a level if there is a higher-level
 				// menu or close the current submenu if there isn't
-				} else if ( which !== RIGHT_KC ) {
+				} else if ( which !== 39 ) {
 					$subMenu = $parentMenu.length !== 0 ? $menu : $menuItem;
 
 					// There is a higher-level menu
@@ -7329,12 +7078,6 @@ $document.on( "keydown", selector + " [role=menuitem]", function( event ) {
 			}
 		}
 	}
-} );
-
-// Prevent Firefox from double-triggering menu behaviour
-$document.on( "keyup", selector + " [role=menuitem]", function( event ) {
-	event.preventDefault();
-	return false;
 } );
 
 // Close the mobile panel if switching to medium, large or extra large view
@@ -8055,7 +7798,7 @@ $document.on( renderUIEvent, selector, function( event, type, data ) {
 		if ( data.shareUrl !== undef ) {
 			$( "<div class='wb-share' data-wb-share=\'{\"type\": \"" +
 				( type === "audio" ? type : "video" ) + "\", \"title\": \"" +
-				data.title.replace( /'/g, "&apos;" ) + "\", \"url\": \"" + data.shareUrl +
+				data.title.replace( "'", "&apos;" ) + "\", \"url\": \"" + data.shareUrl +
 				"\", \"pnlId\": \"" + data.id + "-shr\"}\'></div>" )
 				.insertBefore( $media.parent() )
 				.trigger( "wb-init.wb-share" );
@@ -8578,7 +8321,7 @@ var componentName = "wb-overlay",
 					footer.style.border = "0";
 				}
 
-				overlayCloseFtr = "<button type='button' class='btn btn-sm btn-primary " + closeClassFtr +
+				overlayCloseFtr = "<button type='button' id='ftrClose' class='btn btn-sm btn-primary " + closeClassFtr +
 					"' style='" + buttonStyle +
 					"' title='" + closeTextFtr + " " + spanTextFtr + "'>" +
 					closeTextFtr +
@@ -8599,7 +8342,7 @@ var componentName = "wb-overlay",
 				closeText = i18nText.closeOverlay;
 			}
 			closeText = closeText.replace( "'", "&#39;" );
-			overlayClose = "<button type='button' class='mfp-close " + closeClass +
+			overlayClose = "<button type='button' id='hdrClose' class='mfp-close " + closeClass +
 				"' title='" + closeText + "'>&#xd7;<span class='wb-inv'> " +
 				closeText + "</span></button>";
 
@@ -8740,13 +8483,13 @@ $document.on( "click vclick", "." + closeClass, function( event ) {
 } );
 
 // Handler for clicking on a source link for the overlay
-$document.on( "click vclick keydown", "." + linkClass, function( event ) {
+$document.on( "click vclick", "." + linkClass, function( event ) {
 	var which = event.which,
 		sourceLink = event.currentTarget,
 		overlayId = sourceLink.hash.substring( 1 );
 
 	// Ignore if not initialized and middle/right mouse buttons
-	if ( initialized && ( !which || which === 1 || which === 32 ) ) {
+	if ( initialized && ( !which || which === 1 ) ) {
 		event.preventDefault();
 
 		// Introduce a delay to prevent outside activity detection
@@ -9283,7 +9026,7 @@ var $modal, $modalLink, countdownInterval, i18n, i18nText,
 			temp = document.createElement( "div" );
 
 			// Create the modal dialog.  A temp <div> element is used so that its innerHTML can be set as a string.
-			temp.innerHTML = "<a class='wb-lbx lbx-modal mfp-hide' href='#" + componentName + "-modal'>" + i18nText.timeoutTitle + "</a>" +
+			temp.innerHTML = "<a class='wb-lbx lbx-modal mfp-hide' href='#" + componentName + "-modal'></a>" +
 				"<section id='" + componentName + "-modal' class='mfp-hide modal-dialog modal-content overlay-def'>" +
 				"<header class='modal-header'><h2 class='modal-title'>" + i18nText.timeoutTitle + "</h2></header>" +
 				"<div class='modal-body'></div>" +
@@ -9858,7 +9601,7 @@ wb.add( selector );
  * @license wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
  * @author @jeresiv
  */
-/*jshint scripturl:true*/
+ /*jshint scripturl:true*/
 ( function( $, window, wb ) {
 "use strict";
 
@@ -9989,40 +9732,31 @@ $document.on( "init.dt draw.dt", selector, function( event, settings ) {
 		ol = document.createElement( "OL" ),
 		li = document.createElement( "LI" );
 
-	// Determine if Pagination required
-	if ( paginate_buttons.length === 1 || ( pagination.find( ".previous, .next" ).length === 2 && paginate_buttons.length < 4 ) ) {
-		pagination.addClass( "hidden" );
-	} else {
-
-		// Make sure Pagination is visible
-		pagination.removeClass( "hidden" );
-
-		// Update Pagination List
-		for ( var i = 0; i < paginate_buttons.length; i++ ) {
-			var item = li.cloneNode( true );
-			item.appendChild( paginate_buttons[ i ] );
-			ol.appendChild( item );
-		}
-
-		ol.className = "pagination mrgn-tp-0 mrgn-bttm-0";
-		pagination.empty();
-		pagination.append( ol );
-
-		// Update the aria-pressed properties on the pagination buttons
-		// Should be pushed upstream to DataTables
-		$elm.next( ".bottom" ).find( ".paginate_button" )
-			.attr( {
-				"role": "button",
-				"href": "javascript:;"
-			} )
-			.not( ".previous, .next" )
-				.attr( "aria-pressed", "false" )
-				.html( function( index, oldHtml ) {
-					return "<span class='wb-inv'>" + i18nText.paginate.page + " </span>" + oldHtml;
-				} )
-				.filter( ".current" )
-					.attr( "aria-pressed", "true" );
+	// Update Pagination List
+	for ( var i = 0; i < paginate_buttons.length; i++ ) {
+		var item = li.cloneNode( true );
+		item.appendChild( paginate_buttons[ i ] );
+		ol.appendChild( item );
 	}
+
+	ol.className = "pagination mrgn-tp-0 mrgn-bttm-0";
+	pagination.empty();
+	pagination.append( ol );
+
+	// Update the aria-pressed properties on the pagination buttons
+	// Should be pushed upstream to DataTables
+	$elm.next( ".bottom" ).find( ".paginate_button" )
+		.attr( {
+			"role": "button",
+			"href": "javascript:;"
+		} )
+		.not( ".previous, .next" )
+			.attr( "aria-pressed", "false" )
+			.html( function( index, oldHtml ) {
+				return "<span class='wb-inv'>" + i18nText.paginate.page + " </span>" + oldHtml;
+			} )
+			.filter( ".current" )
+				.attr( "aria-pressed", "true" );
 
 	if ( event.type === "init" ) {
 
@@ -10045,31 +9779,13 @@ $document.on( "submit", ".wb-tables-filter", function( event ) {
 	// Lets reset the search;
 	$datatable.search( "" ).columns().search( "" );
 
-	// Lets loop throug all options
-	var $value = "", $lastColumn = -1;
+    // Lets loop throug all options
 	$form.find( "[name]" ).each( function() {
 		var $elm = $( this ),
-			$column = parseInt( $elm.attr( "data-column" ), 10 );
-
-		if ( $elm.is( "select" ) ) {
-			$value = $elm.find( "option:selected" ).val();
-		} else if ( $elm.is( ":checkbox" ) ) {
-			if ( $column !== $lastColumn && $lastColumn !== -1 ) {
-				$value = "";
-			}
-			$lastColumn = $column;
-
-			if ( $elm.is( ":checked" ) ) {
-				$value += ( $value.length > 0 ) ? "|" : "";
-				$value += $elm.val();
-			}
-		} else {
-			$value = $elm.val();
-		}
+			$value = ( $elm.is( "select" ) ) ? $elm.find( "option:selected" ).val() : $elm.val();
 
 		if ( $value ) {
-			$value = $value.replace( /\s/g, "\\s*" );
-			$datatable.column( $column ).search( "(" + $value + ")", true ).draw();
+			$datatable.column( parseInt( $elm.attr( "data-column" ), 10 ) ).search( $value ).draw();
 		}
 	} );
 
@@ -10085,8 +9801,6 @@ $document.on( "click", ".wb-tables-filter [type='reset']", function( event ) {
 	$datatable.search( "" ).columns().search( "" ).draw();
 
 	$form.find( "select" ).prop( "selectedIndex", 0 );
-	$form.find( "input:checkbox" ).prop( "checked", false );
-	$form.find( "input[type=date]" ).val( "" );
 
 	return false;
 } );
@@ -10120,6 +9834,8 @@ var componentName = "wb-tabs",
 	setFocusEvent = "setfocus.wb",
 	controls = selector + " ul[role=tablist] a, " + selector + " ul[role=tablist] .tab-count",
 	initialized = false,
+	equalHeightClass = "wb-eqht",
+	equalHeightOffClass = equalHeightClass + "-off",
 	tabsAccordionClass = "tabs-acc",
 	nestedTglPanelSelector = "> .tabpanels > details > .tgl-panel",
 	activePanel = "-activePanel",
@@ -10483,6 +10199,8 @@ var componentName = "wb-tabs",
 			isDetails = $panels[ 0 ].nodeName.toLowerCase() === "details",
 			isActive, item, link, panelId, activeFound;
 
+		$panels.attr( "tabindex", "-1" );
+
 		for ( ; tabCounter !== -1; tabCounter -= 1 ) {
 			item = panels[ tabCounter ];
 			isActive = item.className.indexOf( "out" ) === -1;
@@ -10781,6 +10499,10 @@ var componentName = "wb-tabs",
 									"aria-expanded": "true"
 								} );
 						}
+
+						// Enable equal heights for large view or disable for small view
+						$elm.toggleClass( equalHeightClass, !isSmallView );
+						$elm.toggleClass( equalHeightOffClass, isSmallView );
 
 						$summary.attr( "aria-hidden", !isSmallView );
 						$tablist.attr( "aria-hidden", isSmallView );
@@ -11387,8 +11109,9 @@ var componentName = "wb-toggle",
 			if ( isGroup ) {
 
 				// Get the grouped elements using data.group as the CSS selector
+				// and filter to only retrieve currently open grouped elements
 				dataGroup = $.extend( {}, data, { selector: data.group } );
-				$elmsGroup = getElements( link, dataGroup );
+				$elmsGroup = getElements( link, dataGroup ).filter( "." + data.stateOn + ", [open]" );
 
 				// Set the toggle state to "off".  For tab lists, this is stored on the tab element
 				setState( isTablist ? $( data.parent ).find( selectorTab ) : $elmsGroup,
@@ -11422,12 +11145,6 @@ var componentName = "wb-toggle",
 				isTablist: isTablist,
 				elms: $elms
 			} );
-
-			// Ensure that last focused element in the accordion remains keyboard focusable
-			// whether it is collapsed or not
-			if ( isGroup ) {
-				$elms.find( "summary" ).attr( { "tabindex": "0" } );
-			}
 
 			// Store the toggle link's current state if persistence is turned on.
 			// Try/catch is required to address exceptions thrown when using BB10 or

@@ -1,10 +1,10 @@
 /*
-* Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
-* wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
-*/
+ * Web Experience Toolkit (WET) / Boîte à outils de l"expérience Web (BOEW)
+ * wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html
+ */
 /*
 ----- Chinese (Simplified) dictionary (il8n) ---
-*/
+ */
 ( function( wb ) {
 "use strict";
 
@@ -107,7 +107,6 @@ wb.i18nDict = {
 	"frm-nosubmit": "表格无法提交，因为",
 	"errs-fnd": "找到错误。",
 	"err-fnd": "找到错误。",
-	"err-correct": "(Correct and resubmit)",
 
 	/* Date picker */
 	"date-hide": "隐藏日历",
@@ -157,7 +156,6 @@ wb.i18nDict = {
 	/* Charts widget */
 	"tbl-txt": "表格",
 	"tbl-dtls": "图表。详细资料表如下。",
-	"chrt-cmbslc": "Combined slice",
 
 	/* Session timeout */
 	"st-to-msg-bgn": "#min#＃分#sec#秒，您的会话将自动失效。",
@@ -198,9 +196,9 @@ wb.i18nDict = {
 	"geo-allyttl": "说明：地图导航",
 	"geo-tgllyr": "该层的显示切换",
 	"geo-hdnlyr": "这层隐藏。",
-	"geo-bmapurl": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
+	"geo-bmapurl": "@geo-bmapurl@",
 	"geo-bmapttl": "BaseMaps_CBMT3978",
-	"geo-bmapurltxt": "//geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3978/MapServer/WMTS/tile/1.0.0/BaseMaps_CBMT3978/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg",
+	"geo-bmapurltxt": "@geo-bmapurltxt@",
 	"geo-attrlnk": "//geogratis.gc.ca/geogratis/CBM_CBC?lang=en",
 	"geo-attrttl": "GeoGratis-加拿大底图（英语或法语",
 	"geo-sel": "选择",
